@@ -19,7 +19,6 @@ UObject* UMyTextureArrayFactory::FactoryCreateNew(UClass* InClass, UObject* InPa
 	if (InitTextures.Num() > 0)
 	{
 		NewTextureArray->MyTextures = InitTextures;
-		return NewTextureArray;
 	}
 	return NewTextureArray;
 }

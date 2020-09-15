@@ -17,4 +17,5 @@ class MYPLUGIN_API UTextureArray : public UObject
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnyWhere)
 	TArray<class UTexture2D*> MyTextures;
+
 };
