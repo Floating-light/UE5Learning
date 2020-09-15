@@ -7,7 +7,7 @@
 #include "IContentBrowserSingleton.h"
 
 #include "TextureArray.h"
-#include "MyTextureArrayFactory.h"
+#include "Factory/MyTextureArrayFactory.h"
 
 #define LOCTEXT_NAMESPACE "MyTextureArray"
 
