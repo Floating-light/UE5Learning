@@ -13,3 +13,21 @@ AMyProjectGameMode::AMyProjectGameMode()
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
 }
+
+void AMyProjectGameMode::StartPlay()
+{
+	Super::StartPlay();
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("My Game mode! "));
+	}
+}
+
+void AMyProjectGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("My Game mode begin play! "));
+	}
+}

@@ -59,31 +59,31 @@ void FTextAssetEditorToolkit::Initialize(UTextAsset* InTextAsset, const EToolkit
 		->AddArea
 		(
 			FTabManager::NewPrimaryArea()
-				->SetOrientation(Orient_Horizontal)
+				->SetOrientation(Orient_Vertical)
 				->Split
 				(
 					FTabManager::NewSplitter()
-						->SetOrientation(Orient_Vertical)
-						->SetSizeCoefficient(0.66f)
+						->SetOrientation(Orient_Horizontal)
+						//->SetSizeCoefficient(0.5)
 						->Split
 						(
 							FTabManager::NewStack()
 								->AddTab(GetToolbarTabId(), ETabState::OpenedTab)
-								->SetHideTabWell(true)
-								->SetSizeCoefficient(0.1f)
+								->SetHideTabWell(false)
+								->SetSizeCoefficient(0.5f)
 								
 						)
 						->Split
 						(
 							FTabManager::NewStack()
 								->AddTab(TextAssetEditor::TabId, ETabState::OpenedTab)
-								->SetHideTabWell(true)
-								->SetSizeCoefficient(0.9f)
+								->SetHideTabWell(false)
+								->SetSizeCoefficient(0.5f)
 						)
 				)
 		);
 
-	FAssetEditorToolkit::InitAssetEditor(
+	FAssetEditorToolkit::InitAssetEditor( // µ˜”√¡ÀRegisterTabSpawners
 		InMode,
 		InToolkitHost,
 		TextAssetEditor::AppIdentifier,

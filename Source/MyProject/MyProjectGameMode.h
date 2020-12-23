@@ -13,6 +13,12 @@ class AMyProjectGameMode : public AGameModeBase
 
 public:
 	AMyProjectGameMode();
+	/** Transitions to calls BeginPlay on actors. 
+		UWorld::BeginPlay ---> AGameModeBase::StartPlay ---> AGameModeBase::BeginPlay()
+	 */
+	virtual void StartPlay() override;
+
+	virtual void BeginPlay() override;
 };
 
 
