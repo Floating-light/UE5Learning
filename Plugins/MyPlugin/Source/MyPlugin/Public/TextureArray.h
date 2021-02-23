@@ -6,6 +6,14 @@
 #include "UObject/NoExportTypes.h"
 #include "TextureArray.generated.h"
 
+
+DECLARE_DELEGATE_RetVal_OneParam(int,MyTestDelegate,  const FString&);
+
+// FUNC_DECLARE_DELEGATE( MyTestDelegate,int , const FString& )
+
+//#define FUNC_DECLARE_DELEGATE( DelegateName, ... ) 
+	typedef TBaseDelegate<int, const FString&> MyTestDelegate_;
+
 /**
  * 
  */
@@ -18,4 +26,10 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnyWhere)
 	TArray<class UTexture2D*> MyTextures;
 
+	MyTestDelegate Deleg;
+
+	void MyFuncTion()
+	{
+
+	}
 };
