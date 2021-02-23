@@ -21,6 +21,13 @@ class STextAssetEditor
 public:
 
 	SLATE_BEGIN_ARGS(STextAssetEditor) { }
+
+	// ¹«¿ªÊôÐÔ
+
+	SLATE_ATTRIBUTE(FText, Text)
+
+	SLATE_EVENT(FOnClicked, OnClicked)
+	
 	SLATE_END_ARGS()
 
 public:

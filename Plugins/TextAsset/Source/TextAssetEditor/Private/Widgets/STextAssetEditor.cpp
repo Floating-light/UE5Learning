@@ -57,6 +57,7 @@ void STextAssetEditor::Construct(const FArguments& InArgs, UTextAsset* InTextAss
 
 void STextAssetEditor::HandleEditableTextBoxTextChanged(const FText& NewText)
 {
+	// 资源出现*标记
 	TextAsset->MarkPackageDirty();
 }
 

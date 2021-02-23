@@ -63,7 +63,7 @@ void FTextAssetEditorToolkit::Initialize(UTextAsset* InTextAsset, const EToolkit
 				->Split
 				(
 					FTabManager::NewSplitter()
-						->SetOrientation(Orient_Vertical)
+						->SetOrientation(Orient_Horizontal)
 						->SetSizeCoefficient(0.66f)
 						->Split
 						(

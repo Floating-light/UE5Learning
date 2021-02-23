@@ -14,8 +14,13 @@ class MYPLUGIN_API UDirectionIndicator : public UUserWidget
 {
 	GENERATED_BODY()
 public:
+	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = true))
 	class USceneComponent* IndicatedComponent;
+
+	UPROPERTY(meta = (BindWidget))
+	class UImage* MyImage;
 
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 

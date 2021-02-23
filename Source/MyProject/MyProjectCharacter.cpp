@@ -132,3 +132,13 @@ void AMyProjectCharacter::MoveRight(float Value)
 		AddMovementInput(Direction, Value);
 	}
 }
+
+void AMyProjectCharacter::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+}
+
+void AMyProjectCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+}
