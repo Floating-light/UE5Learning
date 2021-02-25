@@ -18,6 +18,9 @@ class AMyProjectCharacter : public ACharacter
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
+protected:
+	TWeakObjectPtr<class UMyAbilitySystemComponent> AbilitySystemComponent;
+
 public:
 	AMyProjectCharacter();
 
@@ -63,13 +66,13 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// End of APawn interface
 
+	// Client only 
+	virtual void OnRep_PlayerState() override;
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
-	
-	virtual void OnRep_PlayerState() override;
 
 	virtual void PossessedBy(AController* NewController) override;
 };
