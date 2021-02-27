@@ -12,8 +12,6 @@ AMyTest::AMyTest()
 	PrimaryActorTick.bCanEverTick = true;
 	UMyActorComponent* MyComp = CreateDefaultSubobject<UMyActorComponent>(TEXT("MyTestComponent"));
 	AddInstanceComponent(MyComp);
-
-
 }
 
 // Called when the game starts or when spawned

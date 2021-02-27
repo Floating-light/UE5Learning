@@ -9,6 +9,9 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
 
+#include "MyAbilitySystemComponent.h"
+#include "MyPlayerState.h"
+
 //////////////////////////////////////////////////////////////////////////
 // AMyProjectCharacter
 
@@ -84,12 +87,12 @@ void AMyProjectCharacter::OnResetVR()
 
 void AMyProjectCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
 {
-		Jump();
+	Jump();
 }
 
 void AMyProjectCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
 {
-		StopJumping();
+	StopJumping();
 }
 
 void AMyProjectCharacter::TurnAtRate(float Rate)
@@ -136,9 +139,31 @@ void AMyProjectCharacter::MoveRight(float Value)
 void AMyProjectCharacter::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
+	AMyPlayerState* PS = GetPlayerState<AMyPlayerState>();
+	if (PS)
+	{
+		AbilitySystemComponent = Cast<UMyAbilitySystemComponent>(PS->GetAbilitySystemComponent());
+		AbilitySystemComponent->InitAbilityActorInfo(PS, this);
+	}
 }
 
+// server
 void AMyProjectCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
+	
+	// ASC owner也为这个Chacter, 在自己的contructor中创建
+	//if (AbilitySystemComponent.IsValid())
+	//{
+	//	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	//}
+
+	// 如果Owner为PS, 
+	AMyPlayerState* PS = GetPlayerState<AMyPlayerState>();
+	if (PS)
+	{
+		AbilitySystemComponent = Cast<UMyAbilitySystemComponent>(PS->GetAbilitySystemComponent());
+		AbilitySystemComponent->InitAbilityActorInfo(PS, this);
+	}
+	SetOwner(NewController);
 }
