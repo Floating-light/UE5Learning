@@ -44,6 +44,9 @@ protected:
 	virtual bool IsReadyForFinishDestroy()override;
 	virtual void FinishDestroy() override;
 
+	UFUNCTION(BlueprintNativeEvent)
+	void MyNative();
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

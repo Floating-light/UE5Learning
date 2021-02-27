@@ -24,6 +24,7 @@ public:
 		{
 			UE_LOG(LogTestGame, Warning, TEXT("%s : -------------->>> %d"), *Id, i);
 		}
+		GEngine->AddOnScreenDebugMessage();
 		return 0;
 	}
 

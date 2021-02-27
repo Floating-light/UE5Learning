@@ -94,4 +94,9 @@ void AMyTest::FinishDestroy()
 	UE_LOG(LogMyActorLifeCycle, Warning, TEXT("Call------------------>>> AMyTest::FinishDestroy"));
 }
 
+void AMyTest::MyNative_Implementation()
+{
+
+}
+
 
