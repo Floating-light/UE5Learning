@@ -12,7 +12,7 @@ void ADelegateTest::MyTestFucntion()
 	BindedDelegate.BindUFunction();*/
 	//MyDynamicMutiDele.AddDynamic();
 
-	MyOdidinaryDele::CreateStatic([](FString str) { return 1; });
-	MyOrdinary.CreateStatic([](FString str) { return 1; });
+	//MyOdidinaryDele::CreateStatic([](FString str) { return int(str[0]); });
+	//MyOrdinary.CreateStatic([](FString str) { return int(str[0]); });
 	//MyOrdinary.BindStatic()
 }
