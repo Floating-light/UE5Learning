@@ -21,8 +21,71 @@ class AMyProjectCharacter : public ACharacter
 protected:
 	TWeakObjectPtr<class UMyAbilitySystemComponent> AbilitySystemComponent;
 
+	// multiplayer test 
+	UPROPERTY(EditDefaultsOnly, Category = "Health")
+		float MaxHealth;
+	UPROPERTY(ReplicatedUsing = OnRep_CurrentHealth)
+		float CurrentHealth;
+	UFUNCTION()
+		void OnRep_CurrentHealth();
+
+	// 对CurrentHealth的改变的结果做出反应
+	// Client : 当CurrentHealth被复制过来时, 在OnRep_CurrentHealth() 中调用
+	// Server : 改变CurrentHealth时主动调用(health的改变只能发生在Server上)
+	void OnHealthUpdate();
+
+	// fire handle ---------------------------------------------------------------
+
+	UPROPERTY(EditDefaultsOnly, Category = "Gameplay|Projectile")
+		TSubclassOf<class AMyProjectile> ProjectileClass;
+
+	/** Delay between shots in seconds. Used to control fire rate for our test projectile, but also to prevent an overflow of server functions from binding SpawnProjectile directly to input.*/
+	UPROPERTY(EditDefaultsOnly, Category = "Gameplay")
+		float FireRate;
+
+	/** If true, we are in the process of firing projectiles. */
+	bool bIsFiringWeapon;
+
+	/** Function for beginning weapon fire.*/
+	UFUNCTION(BlueprintCallable, Category = "Gameplay")
+		void StartFire();
+
+	/** Function for ending weapon fire. Once this is called, the player can use StartFire again.*/
+	UFUNCTION(BlueprintCallable, Category = "Gameplay")
+		void StopFire();
+
+	/** Server function for spawning projectiles.*/
+	// 仅有的RPC函数, 在Server上Spawn projectiles, 且为Reliable, 保证调用到, 但保存这样的函数的队列长度有限, 会溢出, 将会强制Client断开链接.
+	// Client ---> call function on server
+	// 必须十分小心在Client上调用这个函数的频率
+	UFUNCTION(Server, Reliable)
+		void HandleFire();
+
+	/** A timer handle used for providing the fire rate delay in-between spawns.*/
+	FTimerHandle FiringTimer;
+
+public:
+	/** Getter for Max Health.*/
+	UFUNCTION(BlueprintPure, Category = "Health")
+		FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
+
+	/** Getter for Current Health.*/
+	UFUNCTION(BlueprintPure, Category = "Health")
+		FORCEINLINE float GetCurrentHealth() const { return CurrentHealth; }
+
+	/** Setter for Current Health. Clamps the value between 0 and MaxHealth and calls OnHealthUpdate. Should only be called on the server.*/
+	UFUNCTION(BlueprintCallable, Category = "Health")
+		void SetCurrentHealth(float healthValue);
+
+	/** Event for taking damage. Overridden from APawn.*/
+	// build-in applying damage 函数 会调用目标actor的TakeDamage函数.
+	// 这也应该发生在Server
+	UFUNCTION(BlueprintCallable, Category = "Health")
+		virtual float TakeDamage(float DamageTaken, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 public:
 	AMyProjectCharacter();
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)

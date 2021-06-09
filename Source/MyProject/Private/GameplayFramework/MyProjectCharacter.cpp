@@ -8,6 +8,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Net/UnrealNetwork.h"
+#include "Engine/Engine.h"
+#include "Actor/MyProjectile.h"
 
 #include "AbilitySystem/MyAbilitySystemComponent.h"
 #include "GameplayFramework/MyPlayerState.h"
@@ -48,6 +51,101 @@ AMyProjectCharacter::AMyProjectCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+
+	MaxHealth = 100.0f;
+	CurrentHealth = MaxHealth;
+
+	//Initialize projectile class
+	ProjectileClass = AMyProjectile::StaticClass();
+	//Initialize fire rate
+	FireRate = 0.25f;
+	bIsFiringWeapon = false;
+
+}
+
+// 负责由Replicated修饰的变量的复制, 并允许配置如何复制
+void AMyProjectCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	// 将需要复制的属性添加到OutLifetimeProps中.
+	// DOREPLIFETIME(AMyProjectCharacter, CurrentHealth);
+	FProperty* ReplicatedProperty = 
+		GetReplicatedProperty(StaticClass(), AMyProjectCharacter::StaticClass(), GET_MEMBER_NAME_CHECKED(AMyProjectCharacter, CurrentHealth));
+	RegisterReplicatedLifetimeProperty(ReplicatedProperty, OutLifetimeProps, FDoRepLifetimeParams());
+}
+
+void AMyProjectCharacter::OnHealthUpdate()
+{
+	if (IsLocallyControlled()) // Client
+	{
+		FString healthMessage = FString::Printf(TEXT("Client : You now have %f health remaining."), CurrentHealth);
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, healthMessage);
+
+		if (CurrentHealth <= 0)
+		{
+			FString deathMessage = FString::Printf(TEXT("You have been killed."));
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, deathMessage);
+		}
+	}
+
+	if(GetLocalRole() == ROLE_Authority)
+	{
+		FString healthMessage = FString::Printf(TEXT("Server: %s now has %f health remaining."), *GetFName().ToString(), CurrentHealth);
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, healthMessage);
+	}
+
+	// Any special functionality that should occur as a result of damage or death should be placed here. 
+}
+
+void AMyProjectCharacter::SetCurrentHealth(float healthValue)
+{
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		CurrentHealth = FMath::Clamp(healthValue, 0.0f, MaxHealth);
+		OnHealthUpdate();
+	}
+}
+
+
+void AMyProjectCharacter::OnRep_CurrentHealth()
+{
+	OnHealthUpdate();
+}
+
+float AMyProjectCharacter::TakeDamage(float DamageTaken, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float damageApplied = CurrentHealth - DamageTaken;
+	SetCurrentHealth(damageApplied);
+	return damageApplied;
+}
+
+void AMyProjectCharacter::StartFire()
+{
+	if (!bIsFiringWeapon)
+	{
+		bIsFiringWeapon = true;
+		UWorld* World = GetWorld();
+		World->GetTimerManager().SetTimer(FiringTimer, this, &AMyProjectCharacter::StopFire, FireRate, false);
+		HandleFire(); // RPC to server
+	}
+}
+
+void AMyProjectCharacter::StopFire()
+{
+	bIsFiringWeapon = false;
+}
+
+void AMyProjectCharacter::HandleFire_Implementation()
+{
+	FVector spawnLocation = GetActorLocation() + (GetControlRotation().Vector() * 100.0f) + (GetActorUpVector() * 50.0f);
+	FRotator spawnRotation = GetControlRotation();
+
+	FActorSpawnParameters spawnParameters;
+	spawnParameters.Instigator = GetInstigator();
+	spawnParameters.Owner = this;
+
+	AMyProjectile* spawnedProjectile = GetWorld()->SpawnActor<AMyProjectile>(spawnLocation, spawnRotation, spawnParameters);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -77,6 +175,9 @@ void AMyProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 
 	// VR headset functionality
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AMyProjectCharacter::OnResetVR);
+
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AMyProjectCharacter::StartFire);
+
 }
 
 
